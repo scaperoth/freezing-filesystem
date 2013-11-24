@@ -8,7 +8,6 @@ The main component of the system is a hook into the sysw_write call that calls a
 From there, a user-helper thread is woken up and gets the information from the kernel to log any changes made to a file before it is rolled back.
 
 The exact kernel being used can be found from the main [kernel.org linux v2.6 index](https://www.kernel.org/pub/linux/kernel/v2.6/).
----
 
 ###Dependecies (other than OS version)
 This project requires the fs/read_write.c kernel file to be manipulated adding a function pointer in the sys_write function. 
