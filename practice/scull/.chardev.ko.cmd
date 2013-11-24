@@ -1,0 +1,1 @@
+cmd_/root/Desktop/scaperoth_csci3411/practice/scull/chardev.ko := ld -m elf_i386 -m elf_i386 -r -o /root/Desktop/scaperoth_csci3411/practice/scull/chardev.ko /root/Desktop/scaperoth_csci3411/practice/scull/chardev.o /root/Desktop/scaperoth_csci3411/practice/scull/chardev.mod.o
