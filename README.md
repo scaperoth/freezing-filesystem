@@ -9,5 +9,6 @@ From there, a user-helper thread is woken up and gets the information from the k
 
 The exact kernel being used can be found from the main [kernel.org linux v2.6 index](https://www.kernel.org/pub/linux/kernel/v2.6/).
 ---
-##Dependecies (other than OS version)
+
+###Dependecies (other than OS version)
 This project requires the fs/read_write.c kernel file to be manipulated adding a function pointer in the sys_write function. 
