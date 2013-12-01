@@ -1,7 +1,7 @@
 #include "ring.h"
 
 int main(void) {
-  printf("test\n");
+
     ring_buffer rb = rb_create();
     rb_display(rb);
     rb_enqueue(rb,1);

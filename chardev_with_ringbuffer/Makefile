@@ -8,12 +8,10 @@ all:
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
 	make deviceclean
-	rm run
 
 deviceclean:
 	rmmod chardev.ko
 	rm /dev/osqueue
-	rm Module.symvers
 
 device: 
 	insmod chardev.ko

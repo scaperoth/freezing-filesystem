@@ -27,6 +27,7 @@ __attribute__((section("__versions"))) = {
 	{ 0x1e8e5fac, "register_chrdev" },
 	{ 0x1b7d4074, "printk" },
 	{ 0xc192d491, "unregister_chrdev" },
+	{ 0xd20ae216, "sys_wr_hook" },
 };
 
 static const char __module_depends[]
@@ -35,4 +36,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "E1966849E366FF84E8D2F37");
+MODULE_INFO(srcversion, "3871D0B544B9B6307F3EF7E");

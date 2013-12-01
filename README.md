@@ -13,13 +13,13 @@ The exact kernel being used can be found from the main [kernel.org linux v2.6 in
 This project requires the fs/read_write.c kernel file to be manipulated adding a function pointer in the sys_write function.
 
 ```
-void (*sys_wr_hook)(struct file* file, const char __user * buf, size_t count)=NULL;
+void (*sys_wr_hook)(unsigned int fd,struct file* file, const char __user * buf, size_t count)=NULL;
 EXPORT_SYMBOL(sys_wr_hook);
 
 ...
 
 //inside the sys_write system call
-if(sys_wr_hook) sys_wr_hook(file, buf, count);
+if(sys_wr_hook) sys_wr_hook(fd, file, buf, count);
 ...
 
 ```

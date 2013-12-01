@@ -1,8 +1,8 @@
-cmd_/root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/chardev.o := gcc -m32 -Wp,-MD,/root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/.chardev.o.d  -nostdinc -isystem /usr/lib/gcc/i386-redhat-linux/4.1.1/include -D__KERNEL__ -Iinclude  -include include/linux/autoconf.h -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -Os -pipe -msoft-float -mpreferred-stack-boundary=2  -march=i686 -mtune=generic -mregparm=3 -ffreestanding -Iinclude/asm-i386/mach-generic -Iinclude/asm-i386/mach-default -fomit-frame-pointer -g  -fno-stack-protector -Wdeclaration-after-statement -Wno-pointer-sign   -DMODULE -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(chardev)"  -D"KBUILD_MODNAME=KBUILD_STR(chardev)" -c -o /root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/.tmp_chardev.o /root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/chardev.c
+cmd_/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.o := gcc -m32 -Wp,-MD,/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/.chardev.o.d  -nostdinc -isystem /usr/lib/gcc/i386-redhat-linux/4.1.1/include -D__KERNEL__ -Iinclude  -include include/linux/autoconf.h -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs -fno-strict-aliasing -fno-common -Os -pipe -msoft-float -mpreferred-stack-boundary=2  -march=i686 -mtune=generic -mregparm=3 -ffreestanding -Iinclude/asm-i386/mach-generic -Iinclude/asm-i386/mach-default -fomit-frame-pointer -g  -fno-stack-protector -Wdeclaration-after-statement -Wno-pointer-sign   -DMODULE -D"KBUILD_STR(s)=\#s" -D"KBUILD_BASENAME=KBUILD_STR(chardev)"  -D"KBUILD_MODNAME=KBUILD_STR(chardev)" -c -o /root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/.tmp_chardev.o /root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.c
 
-deps_/root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/chardev.o := \
-  /root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/chardev.c \
-  /root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/chardev.h \
+deps_/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.o := \
+  /root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.c \
+  /root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.h \
   include/linux/kernel.h \
     $(wildcard include/config/preempt/voluntary.h) \
     $(wildcard include/config/debug/spinlock/sleep.h) \
@@ -346,8 +346,8 @@ deps_/root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/chardev.o
   include/asm/uaccess.h \
     $(wildcard include/config/x86/intel/usercopy.h) \
     $(wildcard include/config/x86/wp/works/ok.h) \
-  /root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/ring.h \
+  /root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/ring.h \
 
-/root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/chardev.o: $(deps_/root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/chardev.o)
+/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.o: $(deps_/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.o)
 
-$(deps_/root/Desktop/scaperoth_csci3411/practice/chardev_with_ringbuffer/chardev.o):
+$(deps_/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.o):
