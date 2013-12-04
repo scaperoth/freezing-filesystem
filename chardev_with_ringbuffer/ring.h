@@ -24,6 +24,7 @@ struct ring {
     int head;
     int tail;
     single_node array[BUFFER_LENGTH];
+    struct semaphore sem;
 };
 
 

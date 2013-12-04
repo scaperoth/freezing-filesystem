@@ -4,7 +4,10 @@
 static int Major;		/* assigned to device driver */
 static char msg[BUF_LEN];	/* a stored message */
 static ring_buffer rb;
-static int MAXSIZE = 0xFFF;
+const char *FREEZERPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/freezer";
+
+
+wait_queue_head_t queue;
 
 static struct file_operations fops = {
 	.read = device_read,
@@ -13,40 +16,70 @@ static struct file_operations fops = {
 	.release = device_release
 };
 
+static int umh_test( void )
+{
+	int ret = 0;
+	char *argv[] = {NULL, NULL, NULL };
+	char *envp[] = {"HOME=/", "PATH=/sbin:/usr/sbin:/bin:/usr/bin", NULL };
+	printk("usermodehelper: init\n");
+	ret = call_usermodehelper("~/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/callee", argv, envp,1);
+
+	if (ret != 0)
+		printk("error in call to usermodehelper: %d\n", ret);
+	else
+		printk("everything all right\n");
+
+	return 0;
+}
+
+
 static void freezer_hook(unsigned int fd, struct file* file, const char __user *buf, size_t count){
-	char proclnk[0xFFF];
-	printk("hooked write\n");
+	//printk("hooked write\n");
+	//
+	int buff_length = PATH_MAX+11;
+	char *p, *path;
+	struct dentry *dentry = file->f_dentry->d_parent;	
+	struct vfsmount * vfsmnt = file->f_vfsmnt;
+
+	path = kmalloc(buff_length, GFP_KERNEL);
+
+	if (!path) {
+		printk("Malloc failed...\n");
+		return;
+	}
+
+	p = d_path(dentry, vfsmnt, path, buff_length);
 	
-	struct dentry * d_entry = file->f_dentry;
+	int comparison = strcmp(p, FREEZERPATH);
+	
+	//printk("comparison: %d\n",comparison);
 
-	printk("FNAME: ");
+	if(comparison==0){
+		/*This is where we catch that a write has been done to our file*/
+		printk("FNAME2:  %s\n","freezer");
 
-	 	printk(" %s ",d_entry->d_name.name);
-	 	d_entry = d_entry->d_parent;
-	 	printk(" %s ",d_entry->d_name.name);
-	 	d_entry = d_entry->d_parent;
-	 	printk(" %s ",d_entry->d_name.name);
-	 	d_entry = d_entry->d_parent;
-	 	printk(" %s ",d_entry->d_name.name);
-		
-	printk("\n");
-	//printk("FNAME = %s\n", filename);
+		umh_test();
+	}
+	kfree(path);
 
 	return;
 }
 
 static int device_open(struct inode *inode, struct file *file)
 {
-	rb = rb_create();
+	printk("opener\n"); 
 	try_module_get(THIS_MODULE);
-
+	if(down_interruptible(&char_arr.sem)) {
+		printk(KERN_INFO " could not hold semaphore");
+		return -1;
+	}
 	return 0;
 }
 
 static int device_release(struct inode *inode, struct file *file)
 {
-	rb_delete(rb);
 	module_put(THIS_MODULE);
+	up(&char_arr.sem);
 	return 0;
 }
 
@@ -68,7 +101,7 @@ static ssize_t device_write(struct file *filp, const char *buff,
 		rb_enqueue(rb, s);
 		rb_display(rb);
 	}else return 0;
-	
+
 	if (copy_len == amnt_copied)
 		return -EINVAL;
 
@@ -108,6 +141,11 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t len,
 
 int init_module(void)
 {
+
+	rb = rb_create();
+	printk("Created ring buffer\n");
+	sema_init(&ring.sem,1);
+
 	sys_wr_hook=freezer_hook;
 	Major = register_chrdev(0, DEVICE_NAME, &fops);
 
@@ -119,11 +157,15 @@ int init_module(void)
 	memset(msg, '+', BUF_LEN);
 	printk(KERN_INFO "chardev is assigned to major number %d.\n",
 		Major);
+	
+	init_waitqueue_head(&queue);
 
 	return 0;
 }
 void cleanup_module(void)
 {
+
+	rb_delete(rb);
 	sys_wr_hook=NULL;
 	int ret = unregister_chrdev(Major, DEVICE_NAME);
 	if (ret < 0)

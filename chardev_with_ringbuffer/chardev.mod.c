@@ -18,6 +18,9 @@ __attribute_used__
 __attribute__((section("__versions"))) = {
 	{ 0xb499ef18, "struct_module" },
 	{ 0xf2a644fb, "copy_from_user" },
+	{ 0x72183c, "call_usermodehelper_keys" },
+	{ 0x2e60bace, "memcpy" },
+	{ 0xce7c99bd, "d_path" },
 	{ 0x2da418b5, "copy_to_user" },
 	{ 0x12da5bb2, "__kmalloc" },
 	{ 0x19070091, "kmem_cache_alloc" },
@@ -36,4 +39,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "3871D0B544B9B6307F3EF7E");
+MODULE_INFO(srcversion, "7FC67FCE47FA5CA3D66BE0B");
