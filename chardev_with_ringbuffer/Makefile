@@ -15,11 +15,11 @@ obj:
 
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
+	rm Module.* callee run usrhelp
 	make deviceclean
-
 deviceclean:
 	rmmod chardev.ko
-	rm /dev/osqueue
+	rm -f /dev/osqueue
 
 device: 
 	insmod chardev.ko
