@@ -7,7 +7,7 @@ static ring_buffer rb;
 const char *FREEZERPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/freezer";
 
 
-wait_queue_head_t queue;
+//wait_queue_head_t queue;
 
 static struct file_operations fops = {
 	.read = device_read,
@@ -69,17 +69,18 @@ static int device_open(struct inode *inode, struct file *file)
 {
 	printk("opener\n"); 
 	try_module_get(THIS_MODULE);
+	/**
 	if(down_interruptible(&char_arr.sem)) {
 		printk(KERN_INFO " could not hold semaphore");
 		return -1;
-	}
+	}*/
 	return 0;
 }
 
 static int device_release(struct inode *inode, struct file *file)
 {
 	module_put(THIS_MODULE);
-	up(&char_arr.sem);
+	/*up(&char_arr.sem);*/
 	return 0;
 }
 
@@ -141,12 +142,13 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t len,
 
 int init_module(void)
 {
-
 	rb = rb_create();
+
 	printk("Created ring buffer\n");
-	sema_init(&ring.sem,1);
+	//sema_init(&rb->sem,1);
 
 	sys_wr_hook=freezer_hook;
+
 	Major = register_chrdev(0, DEVICE_NAME, &fops);
 
 	if (Major < 0) {
@@ -158,7 +160,7 @@ int init_module(void)
 	printk(KERN_INFO "chardev is assigned to major number %d.\n",
 		Major);
 	
-	init_waitqueue_head(&queue);
+//	init_waitqueue_head(&queue);
 
 	return 0;
 }

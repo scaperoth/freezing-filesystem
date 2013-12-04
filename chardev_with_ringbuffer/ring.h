@@ -20,11 +20,11 @@ struct node {
 typedef struct ring ring_type;
 typedef struct ring* ring_buffer;
 
-struct ring {
+struct ring{
     int head;
     int tail;
     single_node array[BUFFER_LENGTH];
-    struct semaphore sem;
+    //struct semaphore sem;
 };
 
 
