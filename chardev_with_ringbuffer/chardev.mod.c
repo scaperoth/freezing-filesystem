@@ -23,14 +23,14 @@ __attribute__((section("__versions"))) = {
 	{ 0xce7c99bd, "d_path" },
 	{ 0x2da418b5, "copy_to_user" },
 	{ 0x12da5bb2, "__kmalloc" },
+	{ 0x1e8e5fac, "register_chrdev" },
 	{ 0x19070091, "kmem_cache_alloc" },
 	{ 0xab978df6, "malloc_sizes" },
 	{ 0xdcef6636, "wake_up_process" },
-	{ 0x37a0cba, "kfree" },
-	{ 0x1e8e5fac, "register_chrdev" },
 	{ 0x1b7d4074, "printk" },
 	{ 0xc192d491, "unregister_chrdev" },
 	{ 0xd20ae216, "sys_wr_hook" },
+	{ 0x37a0cba, "kfree" },
 };
 
 static const char __module_depends[]
@@ -39,4 +39,4 @@ __attribute__((section(".modinfo"))) =
 "depends=";
 
 
-MODULE_INFO(srcversion, "7FC67FCE47FA5CA3D66BE0B");
+MODULE_INFO(srcversion, "7CD99E4DF0F5DB91DB1DE95");

@@ -4,7 +4,9 @@
 #include <linux/fs.h>
 #include <linux/kmod.h>
 #include <linux/limits.h>
-//#include <linux/wait.h.>
+#include <asm/semaphore.h>
+#include <linux/wait.h>
+#include <linux/sched.h>
 #include <asm/uaccess.h>
 
 
