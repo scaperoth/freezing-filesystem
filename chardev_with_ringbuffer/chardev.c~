@@ -17,7 +17,7 @@ static struct file_operations fops = {
 DECLARE_WAIT_QUEUE_HEAD(event);
 
 volatile int condvar = 0;
-volatile int should_wait = 0;
+volatile int should_wait = 1;
 
 static int umh_test( void )
 {
@@ -72,16 +72,15 @@ static void freezer_hook(unsigned int fd, struct file* file, const char __user *
 			
 			condvar = 0;
 			printk("The wait has finished!\n");
+		}else {
+			printk(KERN_INFO "Waking up in %i\n", current->pid);
+			condvar = 1;
+			wake_up_interruptible(&event);
+			printk("Woke up the other processes!\n");
 		}
-		
-		printk("Freezer folder name:  %s\n","freezer");
-		umh_test();
 
-		printk(KERN_INFO "Waking up in %i\n", current->pid);
-		condvar = 1;
-		should_wait = 1;
-		wake_up_interruptible(&event);
-		printk("Woke up the other processes!\n");
+		printk("Freezer folder name:  %s\n","freezer");
+			umh_test();
 
 	}
 
