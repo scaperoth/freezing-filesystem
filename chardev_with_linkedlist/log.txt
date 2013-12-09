@@ -1,0 +1,2 @@
+/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/freezer/log.txt
+/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/freezer/log.txt

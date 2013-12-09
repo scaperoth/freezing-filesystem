@@ -1,11 +1,10 @@
 #include "chardev.h"
-#include "ring.h"
+#include "list.h"
 /* Globals localized to file (by use of static */
 static int Major;       /* assigned to device driver */
 static char msg[BUF_LEN];   /* a stored message */
-static ring_buffer rb;
-const char *FREEZERPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/freezer";
-
+static struct linked_list* ll;
+const char *FREEZERPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/freezer";
 
 //wait_queue_head_t queue;
 
@@ -17,17 +16,37 @@ static struct file_operations fops =
     .release = device_release
 };
 
-DECLARE_WAIT_QUEUE_HEAD(event);
+DECLARE_WAIT_QUEUE_HEAD(wq);
+
+static int flag = 0;
 
 volatile int should_wait = 1;
 
-static int umh_test( void )
+static int umh_test(char *argument, char* filename )
 {
+    char **argv = kmalloc(sizeof(char *[3]), GFP_KERNEL);
+
+    if(!argv){
+        printk("Userspace args failed.\n");
+        return 0;
+    }
+
+    char filepath[BUFF]="";
+
+    if(filename!=NULL){
+        strncat(filepath, FREEZERPATH,200);
+        strncat(filepath, "/", 1);
+        strncat(filepath, filename,200);
+    }
+
     int ret = 0;
-    char *argv[] = {NULL, NULL, NULL };
-    char *envp[] = {"HOME=/", "PATH=/sbin:/usr/sbin:/bin:/usr/bin", NULL };
+
+    argv[0] ="/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/callee";
+    argv[1] = argument;
+    argv[2] = filepath;
+    char *envp[] = {"HOME=/", "PATH=/sbin:/usr/sbin:/bin:/usr/bin", NULL  };
     printk("usermodehelper: init\n");
-    ret = call_usermodehelper("/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/callee", argv, envp, 1);
+    ret = call_usermodehelper(argv[0], argv, envp, 1);
 
     if (ret != 0)
         printk("error in call to usermodehelper: %d\n", ret);
@@ -40,6 +59,8 @@ static int umh_test( void )
 
 static void freezer_hook(unsigned int fd, struct file *file, const char __user *buf, size_t count)
 {
+
+
     //printk("hooked write\n");
     //
     int buff_length = PATH_MAX + 11;
@@ -55,34 +76,34 @@ static void freezer_hook(unsigned int fd, struct file *file, const char __user *
         return;
     }
 
+
     p = d_path(dentry, vfsmnt, path, buff_length);
 
     int comparison = strcmp(p, FREEZERPATH);
 
     //printk("comparison: %d\n",comparison);
-    
+
     if (comparison == 0)
     {
-        /*This is where we catch that a write has been done inside our folder*/
-        printk("In the critical section..\n");
-        wait_event_interruptible(event, should_wait == 0);
-        should_wait = 1;
-
-        printk("The wait has finished!\n");
-
-        printk("Freezer folder name:  %s\n", "freezer");
-        umh_test();
-
+        wait_event_interruptible(wq, flag != 0);
         printk(KERN_INFO "Waking up in %i\n", current->pid);
 
-        printk("Woke up the other processes!\n");
+        flag = 0;
+        /*This is where we catch that a write has been done inside our folder*/
+
+        printk("Freezer folder name:  %s\n", "freezer");
+
+        ll_add(ll, file->f_dentry->d_name.name);
+        ll_display(ll);
+
+        umh_test("log", file->f_dentry->d_name.name);
+
+        flag = 1;
+        wake_up_interruptible(&wq);
+
     }
     kfree(path);
 
-    should_wait = 0;
-
-    wake_up_interruptible(&event);
-    
     return;
 }
 
@@ -119,12 +140,8 @@ static ssize_t device_write(struct file *filp, const char *buff,
     /* NOTE: copy_from_user returns the amount of bytes _not_ copied */
     amnt_copied = copy_from_user(s, buff, copy_len);
 
-    if (!rb_isfull(rb))
-    {
-        rb_enqueue(rb, s);
-        rb_display(rb);
-    }
-    else return 0;
+    ll_add(ll, s);
+    ll_display(ll);
 
     if (copy_len == amnt_copied)
         return -EINVAL;
@@ -136,9 +153,9 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t len,
                            loff_t *offset)
 {
     char *c = (char *)kmalloc(len, GFP_KERNEL);
-    if (!rb_isempty(rb))
+    if (ll->length != 0)
     {
-        c = rb_dequeue(rb);
+        c = ll_dequeue(ll);
         if (c == NULL)
         {
             return 0;
@@ -168,7 +185,8 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t len,
 
 int init_module(void)
 {
-    rb = rb_create();
+    ll = ll_create();
+
 
     printk("Created ring buffer\n");
     //sema_init(&rb->sem,1);
@@ -193,8 +211,7 @@ int init_module(void)
 }
 void cleanup_module(void)
 {
-
-    rb_delete(rb);
+    ll_destroy(ll);
     sys_wr_hook = NULL;
     int ret = unregister_chrdev(Major, DEVICE_NAME);
     if (ret < 0)

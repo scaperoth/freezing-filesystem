@@ -1,0 +1,2 @@
+/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/chardev.ko
+/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/chardev.o
