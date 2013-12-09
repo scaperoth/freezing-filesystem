@@ -5,6 +5,8 @@ static int Major;		/* assigned to device driver */
 static char msg[BUF_LEN];	/* a stored message */
 static ring_buffer rb;
 const char *FREEZERPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/freezer";
+
+
 //wait_queue_head_t queue;
 
 static struct file_operations fops = {
@@ -14,20 +16,13 @@ static struct file_operations fops = {
 	.release = device_release
 };
 
-DECLARE_WAIT_QUEUE_HEAD(event);
-
-volatile int condvar = 0;
-volatile int should_wait = 0;
-
 static int umh_test( void )
 {
 	int ret = 0;
 	char *argv[] = {NULL, NULL, NULL };
-	char *envp[] = {"HOME=/", 
-	"TERM=linux",
-	"PATH=/sbin:/usr/sbin:/bin:/usr/bin", NULL };
+	char *envp[] = {"HOME=/", "PATH=/sbin:/usr/sbin:/bin:/usr/bin", NULL };
 	printk("usermodehelper: init\n");
-	ret = call_usermodehelper("/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/callee", argv, envp, 0);
+	ret = call_usermodehelper("/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/callee", argv, envp,1);
 
 	if (ret != 0)
 		printk("error in call to usermodehelper: %d\n", ret);
@@ -41,8 +36,6 @@ static int umh_test( void )
 static void freezer_hook(unsigned int fd, struct file* file, const char __user *buf, size_t count){
 	//printk("hooked write\n");
 	//
-	
-	
 	int buff_length = PATH_MAX+11;
 	char *p, *path;
 	struct dentry *dentry = file->f_dentry->d_parent;	
@@ -62,29 +55,11 @@ static void freezer_hook(unsigned int fd, struct file* file, const char __user *
 	//printk("comparison: %d\n",comparison);
 
 	if(comparison==0){
-		if(should_wait == 1) {
-
-			printk("In the critical section..\n");
-			should_wait = 0;
-			wait_event_interruptible(event, condvar == 1);
-
 		/*This is where we catch that a write has been done to our file*/
-			
-			condvar = 0;
-			printk("The wait has finished!\n");
-		}
-		
-		printk("Freezer folder name:  %s\n","freezer");
+		printk("FNAME2:  %s\n","freezer");
+
 		umh_test();
-
-		printk(KERN_INFO "Waking up in %i\n", current->pid);
-		condvar = 1;
-		should_wait = 1;
-		wake_up_interruptible(&event);
-		printk("Woke up the other processes!\n");
-
 	}
-
 	kfree(path);
 
 	return;
@@ -94,12 +69,11 @@ static int device_open(struct inode *inode, struct file *file)
 {
 	printk("opener\n"); 
 	try_module_get(THIS_MODULE);
-	/*
+	/**
 	if(down_interruptible(&char_arr.sem)) {
 		printk(KERN_INFO " could not hold semaphore");
 		return -1;
-	}
-	*/
+	}*/
 	return 0;
 }
 
@@ -168,9 +142,7 @@ static ssize_t device_read(struct file *filp, char *buffer, size_t len,
 
 int init_module(void)
 {
-
 	rb = rb_create();
-
 
 	printk("Created ring buffer\n");
 	//sema_init(&rb->sem,1);
@@ -183,11 +155,12 @@ int init_module(void)
 		printk(KERN_ALERT "Failed to register char device.\n");
 		return Major;
 	}
-
+	
 	memset(msg, '+', BUF_LEN);
 	printk(KERN_INFO "chardev is assigned to major number %d.\n",
 		Major);
 	
+//	init_waitqueue_head(&queue);
 
 	return 0;
 }

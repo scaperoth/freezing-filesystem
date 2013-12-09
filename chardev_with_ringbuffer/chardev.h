@@ -18,7 +18,8 @@ void cleanup_module(void);
 MODULE_LICENSE("GPL");
 
 extern void * sys_wr_hook;
-extern int call_usermodehelper(char * path, char ** argv, char ** envp, int wait);
+
+extern int call_usermodehelper(char *path, char *argv[], char *envp[], int wait);
 
 static int device_open(struct inode *, struct file *); 
 static int device_release(struct inode *, struct file *); 
