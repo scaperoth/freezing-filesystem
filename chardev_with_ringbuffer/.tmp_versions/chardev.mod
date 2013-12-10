@@ -1,2 +1,0 @@
-/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.ko
-/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_ringbuffer/chardev.o
