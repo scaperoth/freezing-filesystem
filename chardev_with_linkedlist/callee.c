@@ -26,6 +26,7 @@ const char *SNAPSHOTPATH = "snapshot/";
 
 int main(int argc, char *argv[])
 {
+
     char full_log_path[BUFFER_SIZE];
     int decider = -1;
     FILE *fp, *erase_fp;
@@ -128,7 +129,7 @@ int main(int argc, char *argv[])
         if (DEBUG)
             printf("%s\n", command);
 
-        erase_fp = fopen(LOGPATH , "w");
+        erase_fp = fopen(full_log_path , "w");
         fclose(erase_fp);
 
         free(line);

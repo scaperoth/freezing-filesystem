@@ -27,6 +27,7 @@ static struct linked_list *ll;
 /*constant (hardcoded) path names for freezing system*/
 const char *FREEZERPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/freezer";
 const char *SNAPSHOTPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/snapshot";
+const char *USER_HELPER = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/callee";
 
 static struct file_operations fops =
 {
@@ -68,7 +69,7 @@ static int umh_runner(char *argument, char *filename )
 
     int ret = 0;
 
-    argv[0] = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/callee";
+    argv[0] = USER_HELPER;
     argv[1] = argument;
     argv[2] = filepath;
     char *envp[] = {"HOME=/", "PATH=/sbin:/usr/sbin:/bin:/usr/bin", NULL  };
