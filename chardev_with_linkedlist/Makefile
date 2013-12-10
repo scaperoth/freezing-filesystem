@@ -9,14 +9,12 @@ all:
 	make device
 
 obj:
-	$(GCC) $(GCFLAGS) run user_code.c
 	$(GCC) $(GCFLAGS) callee callee.c
-	$(GCC) $(GCFLAGS) usrhelp user_helper.c
 
 clean:
 	make -C /lib/modules/$(shell uname -r)/build M=$(PWD) clean
-	rm -f .symvers callee run usrhelp *#* *~ 
 	make deviceclean
+	rm -f .symvers callee run usrhelp *#* *~ 
 
 deviceclean:
 	rmmod chardev.ko
