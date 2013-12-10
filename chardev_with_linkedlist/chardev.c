@@ -1,3 +1,22 @@
+/*
+ * @author Matt Scaperoth
+ * This module hooks into system calls when installed and wakes
+ * a user space helper to "freeze" a file system (think snapshot). 
+ * 
+ * Once hooked into a system call, the freezer_hook() function
+ * records any changes made to a hard-coded file path.
+ * if the file being changed is a (first) child of the freezer
+ * path, then a user level helper is woken to log these changes.
+ *
+ * When the module is destroyed, it nullifies the system call
+ * hook and "restores" the files that have been logged.
+ * 
+ * TODO: 1. add more hooks for system calls other than write
+ *       2. revisit the wait queue logic in freezer_hook().
+ *       3. create more efficient way of coding freezer and snapshot
+ *           file paths rather than hard-coded constants.
+ */
+
 #include "chardev.h"
 #include "list.h"
 /* Globals localized to file (by use of static */
