@@ -2,30 +2,42 @@
  * @author Matt Scaperoth
  * This is the user space helper for the freezing filesystem
  * this file either logs, snapshots, or restores the frozen file
- * based on the 2nd argument (argv[1]). 
+ * based on the 2nd argument (argv[1]).
  *
  * TODO: change argument from string to constant values or enum
  */
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
-#define _GNU_SOURCE
-#define BUFF 2048
-#define DEBUG = 0;  /*set to 1 to turn on printf statements*/
+#include <syslog.h>
 
-const char *FREEZERPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/freezer/";
-const char *LOGPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/log.txt";
+#define _GNU_SOURCE
+
+#define BUFFER_SIZE 2048
+#define DEBUG 0 /*set to 1 to turn on printf statements*/
+//#define KERNEL_DEBUG 
+
+char command[BUFFER_SIZE];
+
 const char *PROJROOT = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/";
-const char *SNAPSHOTPATH = "/root/Desktop/scaperoth_csci3411/freezing_filesystem/chardev_with_linkedlist/snapshot/";
+const char *FREEZERPATH = "freezer/";
+const char *LOGPATH = "log.txt";
+const char *SNAPSHOTPATH = "snapshot/";
 
 int main(int argc, char *argv[])
 {
-    char command[BUFF] = "";
+    char full_log_path[BUFFER_SIZE];
     int decider = -1;
+    FILE *fp, *erase_fp;
+    char *line = NULL;
+    size_t len = 0;
+    ssize_t read;
 
-    if (argv[1] == NULL){
-        if(DEBUG)
+    if (argv[1] == NULL)
+    {
+        if (DEBUG)
             printf("no arguments given\n");
+        return -1;
     }
 
     /*
@@ -35,62 +47,67 @@ int main(int argc, char *argv[])
     if (strcmp(argv[1], "log") == 0)
         decider = 0;
 
-    if (strcmp(argv[1], "snapshot") == 0)
+    else if (strcmp(argv[1], "snapshot") == 0)
         decider = 1;
 
-    if (strcmp(argv[1], "restore") == 0)
+    else if (strcmp(argv[1], "restore") == 0)
         decider = 2;
 
-    if (decider < 0)
+    else
     {
-        if(DEBUG)
+        if (DEBUG)
             printf("not a valid command\n");
-        return 0;
+
+        return -1;
     }
+
+    if (DEBUG)
+        printf("Decider: %d\n", decider);
 
     switch (decider)
     {
-
     /*LOG case*/
-    case 1:
+    case 0:
+        if (DEBUG)
+            printf("in the log case\n");
+
         if (strcmp(argv[2], "") == 0)
             return 0;
 
-        strncat(command, "echo \"", 8);
-        strncat(command, argv[2], 512);
-        strncat(command, "\" >> ", 32);
-        strncat(command, LOGPATH, 512);
+        sprintf(command, "echo \"%s\" >> %s%s", argv[2], PROJROOT, LOGPATH);
+
+        if (DEBUG)
+            printf("%s\n", command);
 
         system(command);
 
         break;
-
     /*SNAPSHOT case*/
-    case 2:
-        strncat(command, "cp ", 4);
-        strncat(command, FREEZERPATH, 512);
-        strncat(command, "* ", 4);
-        strncat(command, SNAPSHOTPATH, 512);
+    case 1:
+        if (DEBUG)
+            printf("in the SNAPSHOT case\n");
+
+        sprintf(command, "cp %s%s* %s%s", PROJROOT, FREEZERPATH, PROJROOT, SNAPSHOTPATH);
+
+        if (DEBUG)
+            printf("%s\n", command);
 
         system(command);
 
         break;
+    /*RESTORE case*/
+    case 2:
+        if (DEBUG)
+            printf("in the RESTORE case\n");
 
-    /*
-     * RESTORE case
-     * code skeleton from getline() man page
-     */
-    case 3:
+        sprintf(full_log_path, "%s%s", PROJROOT,  LOGPATH);
 
-        FILE *fp;
-        char *line = NULL;
-        size_t len = 0;
-        ssize_t read;
-
-        fp = fopen(LOGPATH, "r");
+        fp = fopen(full_log_path, "r");
 
         if (fp == NULL)
         {
+            if (DEBUG)
+                printf("Failed to open file.\n");
             return 0;
         }
 
@@ -102,16 +119,17 @@ int main(int argc, char *argv[])
             strncat(command, "cp ", 16);
             strncat(command, line, 512);
             strncat(command, " ", 4);
-            strncat(command, FREEZERPATH, 512);
+            strncat(command, PROJROOT, 512);
+            strncat(command, FREEZERPATH, 32);
             strncat(command, "; ", 1);
 
         }
 
-        if(DEBUG)
-            printf("Final command: %s", command);
+        if (DEBUG)
+            printf("%s\n", command);
 
-        FILE *fd = fopen(LOGPATH , "w");
-        fclose(fd);
+        erase_fp = fopen(LOGPATH , "w");
+        fclose(erase_fp);
 
         free(line);
 
