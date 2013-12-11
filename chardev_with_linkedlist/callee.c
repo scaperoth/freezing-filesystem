@@ -15,7 +15,7 @@
 
 #define BUFFER_SIZE 2048
 #define DEBUG 0 /*set to 1 to turn on printf statements*/
-//#define KERNEL_DEBUG 
+//#define KERNEL_DEBUG
 
 char command[BUFFER_SIZE];
 
@@ -129,6 +129,7 @@ int main(int argc, char *argv[])
         if (DEBUG)
             printf("%s\n", command);
 
+        //erases the contents of the log file
         erase_fp = fopen(full_log_path , "w");
         fclose(erase_fp);
 

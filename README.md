@@ -13,13 +13,38 @@ The exact kernel being used can be found from the main [kernel.org linux v2.6 in
 This project requires the fs/read_write.c kernel file to be manipulated adding a function pointer in the sys_write function.
 
 ```
+/*around ln 360 above the sys_write call*/
 void (*sys_wr_hook)(unsigned int fd,struct file* file, const char __user * buf, size_t count)=NULL;
 EXPORT_SYMBOL(sys_wr_hook);
 
 ...
 
-//inside the sys_write system call
+/*inside the sys_write system call*/
+file = fget_light(fd, &fput_needed);
+/*this next line should be added*/
 if(sys_wr_hook) sys_wr_hook(fd, file, buf, count);
-...
+
+if(file) {
+	...
 
 ```
+###USAGE
+Other than what is mentioned in the dependencies section, here is how you can get started with the module.  
+
+Hardcoded filenames and paths will need to be changed in the chardev.c and callee.c files. These declarations are defined constants in the top section of each file.  
+   
+The make file compiles your user space code then builds and installs your kernel module without any arguments. So you only need to call ```make``` and ```make clean```.  
+   
+To test if the module works, run ```make``` then open one of the files in "freezer/*" (like test.txt for example) and write to the file then save. Once you save you can run ```make clean``` to uninstall the module which should restore your modified file back to its previous state before you wrote to it.   
+
+>so a full test may look like:   
+```  
+make   
+emacs freezer/test.txt   
+```  
+this is where you will make changes to the file   
+```  
+make clean   
+```  
+
+and *voila*. Your file is restored. 
